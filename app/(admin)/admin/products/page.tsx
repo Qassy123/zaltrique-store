@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import AddProductForm from "./AddProductForm";
+import AddProductForm from "../AddProductForm";
 
 export const revalidate = 0;
 
