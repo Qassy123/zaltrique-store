@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ShopPage() {
   const products = await prisma.product.findMany({
     orderBy: {
