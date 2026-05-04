@@ -1,6 +1,17 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 
 export default function CheckoutSuccessPage() {
+  useEffect(() => {
+    // Clear cart from localStorage
+    localStorage.removeItem("cart");
+
+    // Optional: force refresh for navbar/cart count update
+    window.dispatchEvent(new Event("cartUpdated"));
+  }, []);
+
   return (
     <main className="min-h-screen bg-black px-6 py-16 text-white">
       <section className="mx-auto max-w-3xl rounded-xl border border-gray-800 p-8 text-center">
