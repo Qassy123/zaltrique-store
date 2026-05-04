@@ -6,8 +6,8 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const orderId = body.orderId;
-    const status = body.status;
-    const trackingCode = body.trackingCode?.trim();
+    const status = String(body.status || "").trim().toLowerCase();
+    const trackingCode = body.trackingCode?.trim() || "";
 
     if (!orderId || !status) {
       return Response.json(
@@ -35,20 +35,26 @@ export async function POST(req: Request) {
       },
     });
 
+    const statusChangedToShipped =
+      existingOrder.status !== "shipped" && status === "shipped";
+
+    const trackingCodeChanged =
+      existingOrder.trackingCode !== trackingCode;
+
     const shouldSendTrackingEmail =
       status === "shipped" &&
       trackingCode &&
-      existingOrder.trackingCode !== trackingCode &&
-      updatedOrder.email;
+      updatedOrder.email &&
+      (statusChangedToShipped || trackingCodeChanged);
 
-    if (shouldSendTrackingEmail) {
+    if (shouldSendTrackingEmail && updatedOrder.email) {
       const trackingUrl = `https://www.royalmail.com/track-your-item#/tracking-results/${trackingCode}`;
 
       await resend.emails.send({
         from:
           process.env.ORDER_EMAIL_FROM ||
           "Zaltrique <orders@zaltriquehq.co.uk>",
-        to: updatedOrder.email as string,
+        to: updatedOrder.email as string, // ✅ FIXED
         subject: "Your Zaltrique order has shipped",
         html: `
           <div style="font-family: Arial, sans-serif; background: #f6f6f6; padding: 24px;">
@@ -91,6 +97,7 @@ export async function POST(req: Request) {
     return Response.json({
       success: true,
       order: updatedOrder,
+      trackingEmailSent: Boolean(shouldSendTrackingEmail),
     });
   } catch (error: any) {
     console.error("UPDATE TRACKING ERROR:", error);
