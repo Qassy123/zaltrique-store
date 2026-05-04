@@ -2,11 +2,25 @@ import { prisma } from "@/lib/prisma";
 import AddProductForm from "./AddProductForm";
 import DeleteProductButton from "./DeleteProductButton";
 import UpdateOrderTrackingForm from "./UpdateOrderTrackingForm";
+import type {
+  Product,
+  Review,
+  ContactMessage,
+  Complaint,
+  Prisma,
+} from "@prisma/client";
 
 export const revalidate = 0;
 
+type OrderWithItemsAndUser = Prisma.OrderGetPayload<{
+  include: {
+    orderItems: true;
+    user: true;
+  };
+}>;
+
 export default async function AdminPage() {
-  const orders = await prisma.order.findMany({
+  const orders: OrderWithItemsAndUser[] = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
     include: {
       orderItems: true,
@@ -14,19 +28,19 @@ export default async function AdminPage() {
     },
   });
 
-  const reviews = await prisma.review.findMany({
+  const reviews: Review[] = await prisma.review.findMany({
     orderBy: { createdAt: "desc" },
   });
 
-  const contacts = await prisma.contactMessage.findMany({
+  const contacts: ContactMessage[] = await prisma.contactMessage.findMany({
     orderBy: { createdAt: "desc" },
   });
 
-  const complaints = await prisma.complaint.findMany({
+  const complaints: Complaint[] = await prisma.complaint.findMany({
     orderBy: { createdAt: "desc" },
   });
 
-  const products = await prisma.product.findMany({
+  const products: Product[] = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
   });
 
@@ -43,7 +57,7 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Products</h2>
 
         <div className="space-y-3">
-          {products.map((product) => (
+          {products.map((product: Product) => (
             <div
               key={product.id}
               className="rounded-lg border border-gray-700 p-4"
@@ -74,7 +88,7 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Orders</h2>
 
         <div className="space-y-4">
-          {orders.map((order) => (
+          {orders.map((order: OrderWithItemsAndUser) => (
             <div
               key={order.id}
               className="rounded-lg border border-gray-700 p-4"
@@ -165,7 +179,7 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Reviews</h2>
 
         <div className="space-y-3">
-          {reviews.map((review) => (
+          {reviews.map((review: Review) => (
             <div
               key={review.id}
               className="rounded-lg border border-gray-700 p-4"
@@ -187,7 +201,7 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Contact Messages</h2>
 
         <div className="space-y-3">
-          {contacts.map((msg) => (
+          {contacts.map((msg: ContactMessage) => (
             <div
               key={msg.id}
               className="rounded-lg border border-gray-700 p-4"
@@ -205,7 +219,7 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Complaints</h2>
 
         <div className="space-y-3">
-          {complaints.map((complaint) => (
+          {complaints.map((complaint: Complaint) => (
             <div
               key={complaint.id}
               className="rounded-lg border border-gray-700 p-4"
