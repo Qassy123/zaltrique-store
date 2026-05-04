@@ -236,15 +236,25 @@ export default function AccountOrdersPage() {
                       </div>
 
                       <div className="mt-4">
-                        {royalMailTrackingUrl ? (
-                          <a
-                            href={royalMailTrackingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center rounded-lg border border-white bg-black px-5 py-3 text-sm font-bold text-white hover:bg-white hover:text-black"
-                          >
-                            Track with Royal Mail
-                          </a>
+                        {royalMailTrackingUrl && order.trackingCode ? (
+                          <div className="rounded-xl border border-gray-800 bg-neutral-950 p-4">
+                            <p className="text-sm text-gray-500">
+                              Tracking code
+                            </p>
+
+                            <p className="mt-1 break-all text-base font-semibold tracking-wide text-white">
+                              {order.trackingCode}
+                            </p>
+
+                            <a
+                              href={royalMailTrackingUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-4 inline-flex items-center justify-center rounded-lg border border-gray-600 bg-black px-5 py-3 text-sm font-bold text-white transition hover:border-white"
+                            >
+                              Track with Royal Mail
+                            </a>
+                          </div>
                         ) : (
                           <p className="text-sm text-gray-400">
                             Tracking will appear here once your order has been
