@@ -1,65 +1,128 @@
 import Image from "next/image";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function HomePage() {
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 4,
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="min-h-[75vh]">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 py-20 lg:grid-cols-2">
+          <div>
+            <p className="mb-4 text-sm uppercase tracking-[0.35em] text-gray-400">
+              Premium General Store
+            </p>
+
+            <h1 className="mb-6 text-5xl font-bold leading-tight text-white md:text-7xl">
+              Discover quality products with a luxury touch.
+            </h1>
+
+            <p className="mb-8 max-w-xl text-lg leading-8 text-gray-300">
+              Zaltrique brings together carefully selected everyday products,
+              stylish essentials, and trending finds in one simple premium
+              store.
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="/shop"
+                className="inline-flex items-center justify-center rounded-full border border-gray-600 px-8 py-3 text-sm font-semibold text-white transition hover:border-white"
+              >
+                Shop Now
+              </Link>
+
+              <Link
+                href="/about"
+                className="inline-flex items-center justify-center rounded-full border border-gray-600 px-8 py-3 text-sm font-semibold text-white transition hover:border-white"
+              >
+                About Zaltrique
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="rounded-3xl border border-gray-800 bg-[#0b0b0b] p-8 shadow-2xl">
+              <Image
+                src="/images/zaltrique-logo.png"
+                alt="Zaltrique logo"
+                width={500}
+                height={500}
+                className="rounded-2xl"
+                priority
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="mb-2 text-sm uppercase tracking-[0.3em] text-gray-500">
+              Latest arrivals
+            </p>
+            <h2 className="text-3xl font-semibold text-white">
+              Featured Products
+            </h2>
+          </div>
+
+          <Link
+            href="/shop"
+            className="text-sm font-semibold text-gray-300 hover:text-white"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            View all products →
+          </Link>
         </div>
-      </main>
-    </div>
+
+        {products.length === 0 ? (
+          <div className="rounded-2xl border border-gray-800 bg-[#0b0b0b] p-8 text-center">
+            <h3 className="mb-2 text-xl font-semibold text-white">
+              No products yet
+            </h3>
+            <p className="text-gray-400">
+              Add products from the admin dashboard and they will appear here.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="group rounded-2xl border border-gray-800 bg-[#0b0b0b] p-4 transition hover:border-gray-500"
+              >
+                <div className="relative mb-4 h-48 overflow-hidden rounded-xl bg-gray-900">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    className="object-cover transition duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                <h3 className="mb-2 text-lg font-medium text-white">
+                  {product.name}
+                </h3>
+
+                <p className="mb-3 line-clamp-2 text-sm text-gray-400">
+                  {product.description}
+                </p>
+
+                <p className="font-semibold text-white">
+                  £{product.price.toFixed(2)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+    </>
   );
 }
