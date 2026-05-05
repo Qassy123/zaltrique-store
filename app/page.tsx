@@ -2,6 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const products = await prisma.product.findMany({
     orderBy: {
@@ -97,14 +100,16 @@ export default async function HomePage() {
                 href={`/product/${product.id}`}
                 className="group rounded-2xl border border-gray-800 bg-[#0b0b0b] p-4 transition hover:border-gray-500"
               >
-                <div className="relative mb-4 h-48 overflow-hidden rounded-xl bg-gray-900">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-cover transition duration-300 group-hover:scale-105"
-                  />
+                <div className="mb-4 flex h-48 items-center justify-center overflow-hidden rounded-xl bg-white p-3">
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      className="object-contain transition duration-300 group-hover:scale-105"
+                    />
+                  </div>
                 </div>
 
                 <h3 className="mb-2 text-lg font-medium text-white">

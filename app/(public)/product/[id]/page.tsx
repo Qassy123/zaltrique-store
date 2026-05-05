@@ -11,9 +11,7 @@ export default async function ProductPage({
   const { id } = await params;
 
   const product = await prisma.product.findUnique({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
   if (!product) {
@@ -36,7 +34,7 @@ export default async function ProductPage({
   }
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-white">
+    <main className="min-h-screen bg-black px-6 py-12 text-white lg:py-16">
       <section className="mx-auto max-w-6xl">
         <Link
           href="/shop"
@@ -45,32 +43,30 @@ export default async function ProductPage({
           ← Back to shop
         </Link>
 
-        <div className="grid gap-10 lg:grid-cols-2">
-          {/* IMAGE */}
-          <div className="rounded-2xl border border-gray-800 bg-white p-6">
-            <div className="relative h-[420px] w-full">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div className="rounded-2xl border border-gray-800 bg-white p-4 sm:p-6">
+            <div className="relative mx-auto aspect-square w-full max-w-[520px]">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 768px) 90vw, (max-width: 1024px) 70vw, 520px"
                 className="object-contain"
                 priority
               />
             </div>
           </div>
 
-          {/* CONTENT */}
-          <div className="flex flex-col justify-center rounded-2xl border border-gray-800 p-6">
+          <div className="rounded-2xl border border-gray-800 p-6 lg:p-8">
             <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-500">
               Zaltrique Product
             </p>
 
-            <h1 className="mb-4 text-4xl font-bold text-white">
+            <h1 className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
               {product.name}
             </h1>
 
-            <p className="mb-6 leading-8 text-gray-300">
+            <p className="mb-6 whitespace-pre-line leading-7 text-gray-300">
               {product.description}
             </p>
 
@@ -82,7 +78,6 @@ export default async function ProductPage({
               <AddToCartButton product={product} />
             </div>
 
-            {/* 🔥 TRUST SECTION */}
             <div className="mt-4 rounded-xl border border-gray-800 bg-neutral-950 p-5">
               <ul className="space-y-2 text-sm text-gray-300">
                 <li>✓ Free UK delivery</li>
