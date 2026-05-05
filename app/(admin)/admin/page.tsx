@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import AddProductForm from "./AddProductForm";
 import DeleteProductButton from "./DeleteProductButton";
+import EditProductForm from "./EditProductForm";
 import UpdateOrderTrackingForm from "./UpdateOrderTrackingForm";
 import type {
   Product,
@@ -57,30 +58,57 @@ export default async function AdminPage() {
         <h2 className="mb-4 text-xl font-semibold">Products</h2>
 
         <div className="space-y-3">
-          {products.map((product: Product) => (
-            <div
-              key={product.id}
-              className="rounded-lg border border-gray-700 p-4"
-            >
-              <p>
-                <strong>{product.name}</strong>
-              </p>
-              <p>{product.description}</p>
-              <p>£{product.price}</p>
+          {products.map((product: Product) => {
+            const productImages =
+              product.images && product.images.length > 0
+                ? product.images
+                : [product.image];
 
-              <img
-                src={product.image}
-                alt={product.name}
-                className="mt-2 h-24 w-24 rounded object-cover"
-              />
+            return (
+              <div
+                key={product.id}
+                className="rounded-lg border border-gray-700 p-4"
+              >
+                <p>
+                  <strong>{product.name}</strong>
+                </p>
 
-              <p className="break-all text-sm text-gray-400">
-                {product.image}
-              </p>
+                <p>{product.description}</p>
+                <p>£{product.price}</p>
 
-              <DeleteProductButton id={product.id} />
-            </div>
-          ))}
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {productImages.map((img, index) => (
+                    <img
+                      key={`${img}-${index}`}
+                      src={img}
+                      alt={`${product.name} image ${index + 1}`}
+                      className="h-24 w-24 rounded border border-gray-800 object-cover"
+                    />
+                  ))}
+                </div>
+
+                <p className="mt-3 text-sm text-gray-400">
+                  {productImages.length} image
+                  {productImages.length === 1 ? "" : "s"}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <EditProductForm
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      description: product.description,
+                      price: product.price,
+                      image: product.image,
+                      images: productImages,
+                    }}
+                  />
+
+                  <DeleteProductButton id={product.id} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

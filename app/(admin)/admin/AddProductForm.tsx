@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function AddProductForm() {
   const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -16,32 +16,39 @@ export default function AddProductForm() {
     const description = formData.get("description");
     const price = formData.get("price");
 
-    if (!imageFile) {
-      alert("Please upload an image");
+    if (imageFiles.length === 0) {
+      alert("Please upload at least 1 image");
+      return;
+    }
+
+    if (imageFiles.length > 5) {
+      alert("You can upload a maximum of 5 images");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Upload image to Cloudinary
-      const uploadData = new FormData();
-      uploadData.append("file", imageFile);
+      const uploadedImages: string[] = [];
 
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: uploadData,
-      });
+      for (const file of imageFiles) {
+        const uploadData = new FormData();
+        uploadData.append("file", file);
 
-      const uploadJson = await uploadRes.json();
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadData,
+        });
 
-      if (!uploadJson.secure_url) {
-        throw new Error("Image upload failed");
+        const uploadJson = await uploadRes.json();
+
+        if (!uploadJson.secure_url) {
+          throw new Error("Image upload failed");
+        }
+
+        uploadedImages.push(uploadJson.secure_url);
       }
 
-      const imageUrl = uploadJson.secure_url;
-
-      // 2. Create product in DB
       const productRes = await fetch("/api/products", {
         method: "POST",
         headers: {
@@ -51,23 +58,21 @@ export default function AddProductForm() {
           name,
           description,
           price: parseFloat(price as string),
-          image: imageUrl,
+          image: uploadedImages[0],
+          images: uploadedImages,
         }),
       });
 
       const productJson = await productRes.json();
 
       if (!productJson.success) {
-        throw new Error("Product creation failed");
+        throw new Error(productJson.error || "Product creation failed");
       }
 
       alert("Product added successfully ✅");
       form.reset();
-      setImageFile(null);
-
-      // refresh page so product shows instantly
+      setImageFiles([]);
       window.location.reload();
-
     } catch (err) {
       console.error(err);
       alert("Something went wrong ❌");
@@ -101,14 +106,37 @@ export default function AddProductForm() {
         className="w-full rounded-lg border border-gray-700 bg-black px-4 py-3 text-white"
       />
 
-      {/* FILE UPLOAD */}
-      <input
-        type="file"
-        accept="image/*"
-        required
-        onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-        className="w-full text-white"
-      />
+      <div>
+        <label className="mb-2 block text-sm text-gray-400">
+          Product images (up to 5)
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          required
+          onChange={(e) => {
+            const files = Array.from(e.target.files || []);
+
+            if (files.length > 5) {
+              alert("You can upload a maximum of 5 images");
+              e.target.value = "";
+              setImageFiles([]);
+              return;
+            }
+
+            setImageFiles(files);
+          }}
+          className="w-full text-white"
+        />
+
+        {imageFiles.length > 0 && (
+          <p className="mt-2 text-sm text-gray-400">
+            {imageFiles.length} image{imageFiles.length === 1 ? "" : "s"} selected
+          </p>
+        )}
+      </div>
 
       <button
         type="submit"

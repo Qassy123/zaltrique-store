@@ -12,6 +12,7 @@ model Product {
   description String
   price       Float
   image       String
+  images      String[] @default([])
   createdAt   DateTime @default(now())
 }
 

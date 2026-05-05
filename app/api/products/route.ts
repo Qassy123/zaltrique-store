@@ -22,30 +22,15 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const contentType = request.headers.get("content-type") || "";
+    const body = await request.json();
 
-    let name = "";
-    let description = "";
-    let price = "";
-    let image = "";
+    const name = String(body.name || "").trim();
+    const description = String(body.description || "").trim();
+    const price = Number(body.price);
+    const images = Array.isArray(body.images) ? body.images.slice(0, 5) : [];
+    const image = String(body.image || images[0] || "").trim();
 
-    if (contentType.includes("application/json")) {
-      const body = await request.json();
-
-      name = body.name;
-      description = body.description;
-      price = body.price;
-      image = body.image;
-    } else {
-      const formData = await request.formData();
-
-      name = String(formData.get("name") || "");
-      description = String(formData.get("description") || "");
-      price = String(formData.get("price") || "");
-      image = String(formData.get("image") || "");
-    }
-
-    if (!name || !description || !price || !image) {
+    if (!name || !description || !price || !image || images.length === 0) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
@@ -56,8 +41,9 @@ export async function POST(request: Request) {
       data: {
         name,
         description,
-        price: Number(price),
+        price,
         image,
+        images,
       },
     });
 

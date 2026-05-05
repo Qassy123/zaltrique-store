@@ -1,7 +1,7 @@
-﻿import Image from "next/image";
-import Link from "next/link";
+﻿import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "./AddToCartButton";
+import ProductImageGallery from "./ProductImageGallery";
 
 export default async function ProductPage({
   params,
@@ -33,6 +33,11 @@ export default async function ProductPage({
     );
   }
 
+  const productImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
+
   return (
     <main className="min-h-screen bg-black px-6 py-12 text-white lg:py-16">
       <section className="mx-auto max-w-6xl">
@@ -44,18 +49,10 @@ export default async function ProductPage({
         </Link>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
-          <div className="rounded-2xl border border-gray-800 bg-white p-4 sm:p-6">
-            <div className="relative mx-auto aspect-square w-full max-w-[520px]">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 90vw, (max-width: 1024px) 70vw, 520px"
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
+          <ProductImageGallery
+            images={productImages}
+            productName={product.name}
+          />
 
           <div className="rounded-2xl border border-gray-800 p-6 lg:p-8">
             <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-500">
