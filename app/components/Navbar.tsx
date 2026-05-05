@@ -108,14 +108,24 @@ export default function Navbar() {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-white md:hidden"
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? "Close" : "Menu"}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <Link
+            href="/cart"
+            onClick={closeMenu}
+            className="rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-white"
+          >
+            {cartText}
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="rounded-md border border-gray-700 px-3 py-2 text-sm font-semibold text-white"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? "Close" : "Menu"}
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
@@ -138,10 +148,6 @@ export default function Navbar() {
             </Link>
 
             <div className="my-2 border-t border-gray-800" />
-
-            <Link href="/cart" onClick={closeMenu} className="hover:text-gray-300">
-              {cartText}
-            </Link>
 
             {user ? (
               <Link href="/account" onClick={closeMenu} className="hover:text-gray-300">
