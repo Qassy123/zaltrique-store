@@ -16,30 +16,39 @@ export default function Navbar() {
     setCartCount(count);
   }
 
-  useEffect(() => {
+  function updateUser() {
     const stored = localStorage.getItem("user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
+    setUser(stored ? JSON.parse(stored) : null);
+  }
 
+  useEffect(() => {
+    updateUser();
     updateCartCount();
 
     window.addEventListener("focus", updateCartCount);
     window.addEventListener("pageshow", updateCartCount);
     window.addEventListener("storage", updateCartCount);
+    window.addEventListener("storage", updateUser);
+    window.addEventListener("cartUpdated", updateCartCount);
 
-    const interval = setInterval(updateCartCount, 500);
+    const interval = setInterval(() => {
+      updateUser();
+      updateCartCount();
+    }, 500);
 
     return () => {
       window.removeEventListener("focus", updateCartCount);
       window.removeEventListener("pageshow", updateCartCount);
       window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("storage", updateUser);
+      window.removeEventListener("cartUpdated", updateCartCount);
       clearInterval(interval);
     };
   }, []);
 
   function closeMenu() {
     setMenuOpen(false);
+    updateUser();
     updateCartCount();
   }
 
@@ -90,8 +99,11 @@ export default function Navbar() {
               Account
             </Link>
           ) : (
-            <Link href="/login" className="hover:text-gray-300">
-              Login
+            <Link
+              href="/signup"
+              className="rounded-full border border-gray-700 px-4 py-2 font-semibold hover:border-white"
+            >
+              Sign up
             </Link>
           )}
         </div>
@@ -112,27 +124,15 @@ export default function Navbar() {
             <Link href="/shop" onClick={closeMenu} className="hover:text-gray-300">
               Shop
             </Link>
-
             <Link href="/about" onClick={closeMenu} className="hover:text-gray-300">
               About
             </Link>
-
-            <Link
-              href="/reviews"
-              onClick={closeMenu}
-              className="hover:text-gray-300"
-            >
+            <Link href="/reviews" onClick={closeMenu} className="hover:text-gray-300">
               Reviews
             </Link>
-
-            <Link
-              href="/contact"
-              onClick={closeMenu}
-              className="hover:text-gray-300"
-            >
+            <Link href="/contact" onClick={closeMenu} className="hover:text-gray-300">
               Contact
             </Link>
-
             <Link href="/faq" onClick={closeMenu} className="hover:text-gray-300">
               FAQ
             </Link>
@@ -144,20 +144,16 @@ export default function Navbar() {
             </Link>
 
             {user ? (
-              <Link
-                href="/account"
-                onClick={closeMenu}
-                className="hover:text-gray-300"
-              >
+              <Link href="/account" onClick={closeMenu} className="hover:text-gray-300">
                 Account
               </Link>
             ) : (
               <Link
-                href="/login"
+                href="/signup"
                 onClick={closeMenu}
-                className="hover:text-gray-300"
+                className="rounded-full border border-gray-700 px-4 py-3 text-center font-semibold hover:border-white"
               >
-                Login
+                Sign up
               </Link>
             )}
           </div>
